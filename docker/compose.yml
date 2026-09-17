@@ -1,0 +1,50 @@
+services:
+  php:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    working_dir: /app
+    volumes:
+      - ..:/app
+    environment:
+      DB_DSN: "pgsql:host=postgres;port=5432;dbname=yii_admin"
+      DB_USERNAME: yii_admin
+      DB_PASSWORD: yii_admin
+      MYSQL_DSN: "mysql:host=mysql;port=3306;dbname=yii_admin"
+      MYSQL_USERNAME: yii_admin
+      MYSQL_PASSWORD: yii_admin
+      SQLITE_DSN: "sqlite::memory:"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      mysql:
+        condition: service_healthy
+
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: yii_admin
+      POSTGRES_USER: yii_admin
+      POSTGRES_PASSWORD: yii_admin
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U yii_admin -d yii_admin"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  mysql:
+    image: mysql:8.0
+    environment:
+      MYSQL_DATABASE: yii_admin
+      MYSQL_USER: yii_admin
+      MYSQL_PASSWORD: yii_admin
+      MYSQL_ROOT_PASSWORD: root
+    ports:
+      - "${MYSQL_PORT:-3306}:3306"
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-proot"]
+      interval: 5s
+      timeout: 5s
+      retries: 10

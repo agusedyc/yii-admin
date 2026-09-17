@@ -1,0 +1,67 @@
+name: build
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  phpunit:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        php: ['8.1', '8.2', '8.3']
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: pdo, pdo_sqlite, pdo_mysql, pdo_pgsql
+          coverage: none
+
+      - uses: ramsey/composer-install@v2
+        with:
+          dependency-versions: highest
+
+      - run: composer test
+        env:
+          XDEBUG_MODE: off
+
+  changed-files:
+    runs-on: ubuntu-latest
+    outputs:
+      php: ${{ steps.changes.outputs.php }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: changes
+        with:
+          filters: |
+            php:
+              - 'src/**'
+              - 'tests/**'
+              - 'config/**'
+              - 'migrations/**'
+              - 'composer.json'
+
+  static-analysis:
+    needs: changed-files
+    if: needs.changed-files.outputs.php == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          coverage: none
+
+      - uses: ramsey/composer-install@v2
+        with:
+          dependency-versions: highest
+
+      - run: composer psalm
+
+      - run: vendor/bin/php-cs-fixer fix --dry-run --diff
+
+      - run: vendor/bin/rector process --dry-run

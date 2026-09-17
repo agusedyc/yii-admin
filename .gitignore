@@ -1,0 +1,10 @@
+/vendor/
+/composer.lock
+/.phpunit.cache/
+/.php-cs-fixer.cache
+/.psalm-cache/
+/config/.merge-plan.php
+/runtime/
+/.idea/
+/.vscode/
+*.cache
