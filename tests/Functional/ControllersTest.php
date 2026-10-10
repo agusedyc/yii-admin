@@ -76,6 +76,9 @@ final class ControllersTest extends FunctionalTestCase
             $this->flash,
             new UrlGeneratorStub(),
             $this->currentRoute,
+            $this->manager,
+            $this->createMock(\Yiisoft\Session\SessionInterface::class),
+            $this->createMock(\Agusedyc\Admin\Access\UserIdProviderInterface::class),
         );
     }
 

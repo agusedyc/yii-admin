@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Agusedyc\Admin\View;
 
+use Agusedyc\Admin\Access\ActiveRoleAccessChecker;
+use Agusedyc\Admin\Access\UserIdProviderInterface;
+
 use function dirname;
 
 use Psr\Http\Message\ResponseFactoryInterface;
@@ -11,9 +14,11 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\StreamFactoryInterface;
 use Yiisoft\Aliases\Aliases;
 use Yiisoft\Csrf\CsrfTokenInterface;
+use Yiisoft\Rbac\ManagerInterface;
 use Yiisoft\Router\CurrentRoute;
 use Yiisoft\Router\UrlGeneratorInterface;
 use Yiisoft\Session\Flash\FlashInterface;
+use Yiisoft\Session\SessionInterface;
 use Yiisoft\View\WebView;
 use Yiisoft\Yii\View\Renderer\CommonParametersInjectionInterface;
 use Yiisoft\Yii\View\Renderer\WebViewRenderer;
@@ -38,6 +43,9 @@ final class AdminViewRenderer implements CommonParametersInjectionInterface
         private readonly FlashInterface $flash,
         private readonly UrlGeneratorInterface $urlGenerator,
         private readonly CurrentRoute $currentRoute,
+        private readonly ManagerInterface $manager,
+        private readonly SessionInterface $session,
+        private readonly UserIdProviderInterface $userIdProvider,
         private readonly array $options = [],
     ) {
         $viewPath = $this->viewPath();
@@ -67,6 +75,13 @@ final class AdminViewRenderer implements CommonParametersInjectionInterface
 
     public function getCommonParameters(): array
     {
+        $userId = $this->userIdProvider->getUserId();
+        $appRoles = [];
+        if ($userId !== null) {
+            $assignments = $this->manager->getRolesByUserId($userId);
+            $appRoles = array_keys($assignments);
+        }
+
         return [
             'csrfToken' => $this->csrfToken->getValue(),
             'csrfParam' => '_csrf',
@@ -74,6 +89,8 @@ final class AdminViewRenderer implements CommonParametersInjectionInterface
             'currentRoute' => $this->currentRoute,
             'flash' => $this->flash,
             'adminParams' => $this->options,
+            'appRoles' => $appRoles,
+            'activeAdminRole' => $this->session->get(ActiveRoleAccessChecker::SESSION_KEY),
         ];
     }
 
