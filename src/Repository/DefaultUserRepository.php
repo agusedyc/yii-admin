@@ -21,6 +21,7 @@ final class DefaultUserRepository implements UserRepositoryInterface
         foreach ($rows as $row) {
             $users[] = new User((string)$row['id'], (string)$row['username'], (string)$row['email']);
         }
+
         return $users;
     }
 
@@ -30,6 +31,7 @@ final class DefaultUserRepository implements UserRepositoryInterface
         if ($row === null) {
             return null;
         }
+
         return new User((string)$row['id'], (string)$row['username'], (string)$row['email']);
     }
 
