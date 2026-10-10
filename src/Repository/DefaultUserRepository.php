@@ -27,7 +27,7 @@ final class DefaultUserRepository implements UserRepositoryInterface
     public function findById(string $id): ?object
     {
         $row = (new Query($this->db))->from('{{%admin_user}}')->where(['id' => $id])->one();
-        if ($row === null || $row === false) {
+        if ($row === null) {
             return null;
         }
         return new User((string)$row['id'], (string)$row['username'], (string)$row['email']);
