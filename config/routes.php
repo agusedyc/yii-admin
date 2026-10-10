@@ -9,6 +9,7 @@ declare(strict_types=1);
  */
 
 use Agusedyc\Admin\Controller\Role;
+use Agusedyc\Admin\Controller\Role\SwitchRoleController;
 use Agusedyc\Admin\Controller\Route as RouteController;
 use Agusedyc\Admin\Controller\User\UserController;
 use Yiisoft\Router\Group;
@@ -45,6 +46,7 @@ return [
                     Route::post('/{name}/edit')->action(Role\UpdateAction::class)->name('update'),
                     Route::post('/{name}/delete')->action(Role\DeleteAction::class)->name('delete'),
                     Route::post('/{name}/permission')->action(Role\PermissionAction::class)->name('permission'),
+                    Route::post('/switch')->action(SwitchRoleController::class)->name('switch'),
                 ),
             Group::create('/user')
                 ->namePrefix('user/')
