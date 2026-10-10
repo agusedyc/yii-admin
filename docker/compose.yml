@@ -27,7 +27,7 @@ services:
       POSTGRES_USER: yii_admin
       POSTGRES_PASSWORD: yii_admin
     ports:
-      - "${POSTGRES_PORT:-5432}:5432"
+      - "${POSTGRES_PORT:-5433}:5432"
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U yii_admin -d yii_admin"]
       interval: 5s
@@ -42,7 +42,7 @@ services:
       MYSQL_PASSWORD: yii_admin
       MYSQL_ROOT_PASSWORD: root
     ports:
-      - "${MYSQL_PORT:-3306}:3306"
+      - "${MYSQL_PORT:-3307}:3306"
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-proot"]
       interval: 5s
